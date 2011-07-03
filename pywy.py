@@ -100,10 +100,17 @@ class Network():
             }
             
 class iwlist():
-    def __init__(nets):
-        print "derp"
+    def __init__(self, nets):
+        self.nets = nets
+    def order_by_quality(self):
+        nets = []
+        for net in self.nets:
+            networks.append((net.quality, net.mac, net.essid,net.channel))
+        networks.sort()
+    def printout(networks):
+        for net in networks:
+            print "\t".join(map(str,net))
 
-nets = []
 for cell in cells:
     net = Network(cell)
     nets.append(net)
