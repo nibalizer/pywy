@@ -14,35 +14,7 @@ factors such as SNR, signal strength, encryption, essid
 
 import sys
 
-filename = sys.argv[1]
 
-with open( filename, 'r') as f:
-    p = f.readlines()
-f.closed
-
-z = []
-for i in p:
-    z.append((i.rstrip()).lstrip())
-
-z = z[1:]
-
-cells = []
-
-i = 0
-cell_delimiters = []
-while i < len(z):
-    if "Cell" in z[i]:
-        cell_delimiters.append(i)
-    i += 1
-
-
-cell_delimiters = cell_delimiters[1:]
-
-foo = 0
-for i in cell_delimiters:
-    cell = z[foo:i]
-    cells.append(cell)
-    foo = i
 
 class Network():
     """
@@ -100,38 +72,58 @@ class Network():
             }
             
 class iwlist():
-    def __init__(self, nets):
-        self.nets = nets
-    def order_by_quality(self):
+    def __init__(self, lines):
+        self.nets = self.parse_lines(lines)
+    def parse_lines(self, lines):
+        z = []
+        for i in lines:
+            z.append((i.rstrip()).lstrip())
+
+        z = z[1:]
+
+        cells = []
+
+        i = 0
+        cell_delimiters = []
+        while i < len(z):
+            if "Cell" in z[i]:
+                cell_delimiters.append(i)
+            i += 1
+
+
+        cell_delimiters = cell_delimiters[1:]
+
+        foo = 0
+        for i in cell_delimiters:
+            cell = z[foo:i]
+            cells.append(cell)
+            foo = i
         nets = []
+        for cell in cells:
+            net = Network(cell)
+            nets.append(net)
+        return nets
+    def order_by_quality(self):
+        networks = []
         for net in self.nets:
             networks.append((net.quality, net.mac, net.essid,net.channel))
         networks.sort()
-    def printout(networks):
+        self.printout(networks)
+    def printout(self, networks):
         for net in networks:
             print "\t".join(map(str,net))
 
-for cell in cells:
-    net = Network(cell)
-    nets.append(net)
-
-wireless = []
-for net in nets:
-    wireless.append((net.quality,net.essid))
-
-networks = []
-for net in nets:
-
-    networks.append((net.quality, net.mac, net.essid,net.channel ))
-
-networks.sort()
-for net in networks:
-
-    print "\t".join(map(str,net))
 
     
+if __name__ == "__main__":
 
-    
+    filename = sys.argv[1]
+
+    with open( filename, 'r') as f:
+        lines = f.readlines()
+    f.closed
+    scan = iwlist(lines)
+    scan.order_by_quality()
 
 
 
